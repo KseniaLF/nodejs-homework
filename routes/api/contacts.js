@@ -18,12 +18,6 @@ const contactAddSchema = Joi.object({
   phone: Joi.string().required(),
 });
 
-const contactPutSchema = Joi.object({
-  name: Joi.string(),
-  email: Joi.string(),
-  phone: Joi.string(),
-});
-
 router.get("/", async (req, res, next) => {
   try {
     const list = await listContacts();
@@ -80,7 +74,7 @@ router.put("/:id", async (req, res, next) => {
       throw HttpError(400, "missing fields");
     }
 
-    const { error } = contactPutSchema.validate(req.body);
+    const { error } = contactAddSchema.validate(req.body);
     if (error) {
       throw HttpError(400, error.message);
     }
@@ -90,7 +84,7 @@ router.put("/:id", async (req, res, next) => {
     if (!updatedContact) {
       throw HttpError(404, "Not found");
     }
-    res.status(200).json(updatedContact);
+    res.json(updatedContact);
   } catch (error) {
     next(error);
   }

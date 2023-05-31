@@ -46,7 +46,7 @@ const updateContact = async (id, body) => {
     return null;
   }
 
-  const updatedContact = { ...contact, ...body };
+  const updatedContact = { id, ...body };
 
   const contacts = await listContacts();
   const newArr = contacts.map((contact) => {
