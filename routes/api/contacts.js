@@ -1,26 +1,19 @@
 const express = require("express");
-const Joi = require("joi");
+const router = express.Router();
 
 const {
-  listContacts,
+  getContacts,
   getContactById,
   addContact,
   removeContact,
   updateContact,
 } = require("../../models/contacts");
 const { HttpError } = require("../../helpers");
-
-const router = express.Router();
-
-const contactAddSchema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().required(),
-  phone: Joi.string().required(),
-});
+const { contactAddSchema } = require("../../schemas/contacts-schemas");
 
 router.get("/", async (req, res, next) => {
   try {
-    const list = await listContacts();
+    const list = await getContacts();
     res.status(200).json(list);
   } catch (error) {
     next(error);
