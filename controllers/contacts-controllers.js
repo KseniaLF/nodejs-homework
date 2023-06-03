@@ -8,7 +8,9 @@ const {
   addContact,
   removeContact,
   updateContact,
+  updateStatusContact,
 } = require("../service/DBOperations");
+const { favoriteSchema } = require("../schemas/favorite");
 
 const getAll = async (req, res, next) => {
   const list = await getContacts();
@@ -45,10 +47,6 @@ const removeOne = async (req, res, next) => {
 };
 
 const updateOne = async (req, res, next) => {
-  if (JSON.stringify(req.body) === "{}") {
-    throw new HttpError(400, "missing fields");
-  }
-
   const { error } = contactAddSchema.validate(req.body);
   if (error) {
     throw new HttpError(400, error.message);
@@ -62,10 +60,25 @@ const updateOne = async (req, res, next) => {
   res.json(updatedContact);
 };
 
+const makeFavorite = async (req, res, next) => {
+  const { error } = favoriteSchema.validate(req.body);
+  if (error) {
+    throw new HttpError(400, error.message);
+  }
+
+  const updatedContact = await updateStatusContact(req.params.id, req.body);
+
+  if (!updatedContact) {
+    throw new HttpError(404, "Not found");
+  }
+  res.json(updatedContact);
+};
+
 module.exports = {
   getAll: ctrlWrapper(getAll),
   getOne: ctrlWrapper(getOne),
   addOne: ctrlWrapper(addOne),
   removeOne: ctrlWrapper(removeOne),
   updateOne: ctrlWrapper(updateOne),
+  makeFavorite: ctrlWrapper(makeFavorite),
 };

@@ -20,10 +20,15 @@ const updateContact = async (id, body) => {
   return Contact.findByIdAndUpdate({ _id: id }, body, { new: true });
 };
 
+const updateStatusContact = async (id, body) => {
+  return Contact.findByIdAndUpdate({ _id: id }, body, { new: true });
+};
+
 module.exports = {
   getContacts,
   getContactById,
   removeContact,
   addContact,
   updateContact,
+  updateStatusContact,
 };

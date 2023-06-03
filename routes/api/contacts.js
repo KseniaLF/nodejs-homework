@@ -13,4 +13,6 @@ router.delete("/:id", moviesController.removeOne);
 
 router.put("/:id", moviesController.updateOne);
 
+router.patch("/:id/favorite", moviesController.makeFavorite);
+
 module.exports = router;
