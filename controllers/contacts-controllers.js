@@ -1,22 +1,18 @@
 const { contactAddSchema } = require("../schemas/contacts-schemas");
 
+const { HttpError } = require("../helpers");
+const ctrlWrapper = require("../decorators/ctrlWrapper");
 const {
   getContacts,
   getContactById,
   addContact,
   removeContact,
   updateContact,
-} = require("../models/contacts");
-const { HttpError } = require("../helpers");
-const ctrlWrapper = require("../decorators/ctrlWrapper");
+} = require("../service/DBOperations");
 
 const getAll = async (req, res, next) => {
-  try {
-    const list = await getContacts();
-    res.status(200).json(list);
-  } catch (error) {
-    next(error);
-  }
+  const list = await getContacts();
+  res.status(200).json(list);
 };
 
 const getOne = async (req, res, next) => {

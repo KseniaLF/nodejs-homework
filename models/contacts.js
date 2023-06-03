@@ -1,70 +1,29 @@
-const fs = require("fs").promises;
-const path = require("path");
+// const Contact = require("../service/schemas/contact");
 
-const { nanoid } = require("nanoid");
+// const getContacts = async () => {
+//   return Contact.find();
+// };
 
-const contactsPath = path.join("models", "contacts.json");
+// const getContactById = async (id) => {
+//   return Contact.findOne({ _id: id });
+// };
 
-const getContacts = async () => {
-  const data = await fs.readFile(contactsPath);
-  return JSON.parse(data);
-};
+// const addContact = async (data) => {
+//   return Contact.create(data);
+// };
 
-const getContactById = async (id) => {
-  const contacts = await getContacts();
-  const result = contacts.find((item) => item.id === id);
-  return result || null;
-};
+// const removeContact = async (id) => {
+//   return Contact.findByIdAndRemove({ _id: id });
+// };
 
-const addContact = async (data) => {
-  const contacts = await getContacts();
-  const newContact = {
-    id: nanoid(),
-    ...data,
-  };
+// const updateContact = async (id, body) => {
+//   return Contact.findByIdAndUpdate({ _id: id }, body, { new: true });
+// };
 
-  contacts.push(newContact);
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-
-  return newContact;
-};
-
-const removeContact = async (id) => {
-  const contact = await getContactById(id);
-
-  const contacts = await getContacts();
-  const newArr = contacts.filter((contact) => contact.id !== id);
-  await fs.writeFile(contactsPath, JSON.stringify(newArr, null, 2));
-
-  return contact || null;
-};
-
-const updateContact = async (id, body) => {
-  const contact = await getContactById(id);
-
-  if (!contact) {
-    return null;
-  }
-
-  const updatedContact = { id, ...body };
-
-  const contacts = await getContacts();
-  const newArr = contacts.map((contact) => {
-    if (contact.id === id) {
-      return updatedContact;
-    }
-    return contact;
-  });
-
-  await fs.writeFile(contactsPath, JSON.stringify(newArr, null, 2));
-
-  return updatedContact || null;
-};
-
-module.exports = {
-  getContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-};
+// module.exports = {
+//   getContacts,
+//   getContactById,
+//   removeContact,
+//   addContact,
+//   updateContact,
+// };
