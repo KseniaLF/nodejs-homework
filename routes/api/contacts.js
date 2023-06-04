@@ -7,20 +7,20 @@ const {
   validateFavoriteBody,
 } = require("../../middlewares");
 
-router.get("/", contactsController.getAll);
+router.get("/", contactsController.getContacts);
 
-router.get("/:id", contactsController.getOne);
+router.get("/:id", contactsController.getContactById);
 
-router.post("/", validateContactBody, contactsController.addOne);
+router.post("/", validateContactBody, contactsController.addContact);
 
-router.delete("/:id", contactsController.removeOne);
+router.delete("/:id", contactsController.removeContact);
 
-router.put("/:id", validateContactBody, contactsController.updateOne);
+router.put("/:id", validateContactBody, contactsController.updateContact);
 
 router.patch(
   "/:id/favorite",
   validateFavoriteBody,
-  contactsController.makeFavorite
+  contactsController.updateStatusContact
 );
 
 module.exports = router;
