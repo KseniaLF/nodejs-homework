@@ -1,18 +1,26 @@
 const express = require("express");
 const router = express.Router();
 
-const moviesController = require("../../controllers/contacts-controllers");
+const { contactsController } = require("../../controllers");
+const {
+  validateContactBody,
+  validateFavoriteBody,
+} = require("../../middlewares");
 
-router.get("/", moviesController.getAll);
+router.get("/", contactsController.getAll);
 
-router.get("/:id", moviesController.getOne);
+router.get("/:id", contactsController.getOne);
 
-router.post("/", moviesController.addOne);
+router.post("/", validateContactBody, contactsController.addOne);
 
-router.delete("/:id", moviesController.removeOne);
+router.delete("/:id", contactsController.removeOne);
 
-router.put("/:id", moviesController.updateOne);
+router.put("/:id", validateContactBody, contactsController.updateOne);
 
-router.patch("/:id/favorite", moviesController.makeFavorite);
+router.patch(
+  "/:id/favorite",
+  validateFavoriteBody,
+  contactsController.makeFavorite
+);
 
 module.exports = router;

@@ -1,5 +1,3 @@
-const { contactAddSchema } = require("../schemas/contacts-schemas");
-
 const { HttpError } = require("../helpers");
 const ctrlWrapper = require("../decorators/ctrlWrapper");
 const {
@@ -10,7 +8,6 @@ const {
   updateContact,
   updateStatusContact,
 } = require("../service/DBOperations");
-const { favoriteSchema } = require("../schemas/favorite");
 
 const getAll = async (req, res, next) => {
   const list = await getContacts();
@@ -27,10 +24,6 @@ const getOne = async (req, res, next) => {
 };
 
 const addOne = async (req, res, next) => {
-  const { error } = contactAddSchema.validate(req.body);
-  if (error) {
-    throw new HttpError(400, error.message);
-  }
   const data = req.body;
   const newContact = await addContact(data);
 
@@ -47,11 +40,6 @@ const removeOne = async (req, res, next) => {
 };
 
 const updateOne = async (req, res, next) => {
-  const { error } = contactAddSchema.validate(req.body);
-  if (error) {
-    throw new HttpError(400, error.message);
-  }
-
   const updatedContact = await updateContact(req.params.id, req.body);
 
   if (!updatedContact) {
@@ -61,11 +49,6 @@ const updateOne = async (req, res, next) => {
 };
 
 const makeFavorite = async (req, res, next) => {
-  const { error } = favoriteSchema.validate(req.body);
-  if (error) {
-    throw new HttpError(400, error.message);
-  }
-
   const updatedContact = await updateStatusContact(req.params.id, req.body);
 
   if (!updatedContact) {
