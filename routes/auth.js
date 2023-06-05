@@ -1,15 +1,26 @@
 const express = require("express");
 
 const AuthController = require("../controllers/auth");
-const { authenticate } = require("../middlewares");
+const { authenticate, validateBody } = require("../middlewares");
+const { authSchema } = require("../schemas/auth");
 
 const router = express.Router();
 
 const jsonParser = express.json();
 
-router.post("/register", jsonParser, AuthController.register);
+router.post(
+  "/register",
+  jsonParser,
+  validateBody(authSchema),
+  AuthController.register
+);
 
-router.post("/login", jsonParser, AuthController.login);
+router.post(
+  "/login",
+  jsonParser,
+  validateBody(authSchema),
+  AuthController.login
+);
 
 router.get("/current", authenticate, AuthController.getCurrent);
 

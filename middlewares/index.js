@@ -1,9 +1,7 @@
-const validateContactBody = require("./validateContactBody");
-const validateFavoriteBody = require("./validateFavoriteBody");
 const authenticate = require("./authenticate");
+const validateBody = require("./validateBody");
 
 module.exports = {
-  validateContactBody,
-  validateFavoriteBody,
   authenticate,
+  validateBody,
 };

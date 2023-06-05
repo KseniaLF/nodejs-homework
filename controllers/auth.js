@@ -13,14 +13,13 @@ const register = async (req, res, next) => {
   };
 
   const currentUser = await User.findOne({ email: user.email });
-
   if (currentUser !== null) {
-    return res.status(409).json({ message: "User already exists" });
+    return res.status(409).json({ message: "Email in use" });
   }
 
   user.password = await bcrypt.hash(user.password, 10);
-
   await User.create(user);
+
   return res.status(201).end();
 };
 
