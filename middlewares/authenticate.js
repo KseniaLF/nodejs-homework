@@ -8,7 +8,7 @@ const authenticate = async (req, res, next) => {
   const [bearer, token] = authorization.split(" ");
 
   if (bearer !== "Bearer") {
-    next(new HttpError(401, "Unauthorized"));
+    next(new HttpError(401, "Not authorized"));
   }
 
   try {
@@ -17,13 +17,13 @@ const authenticate = async (req, res, next) => {
 
     if (!user || !user.token) {
       console.log(123);
-      next(new HttpError(401, "Unauthorized"));
+      next(new HttpError(401, "Not authorized"));
     }
 
     req.user = user;
     next();
   } catch (err) {
-    next(new HttpError(401, "Unauthorized"));
+    next(new HttpError(401, "Not authorized"));
   }
 };
 module.exports = authenticate;
