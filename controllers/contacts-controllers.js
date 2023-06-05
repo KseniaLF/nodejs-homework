@@ -3,7 +3,9 @@ const ctrlWrapper = require("../decorators/ctrlWrapper");
 const db = require("../service/DBOperations");
 
 const getContacts = async (req, res, next) => {
-  const list = await db.getContacts();
+  const { _id: owner } = req.user;
+
+  const list = await db.getContacts(owner);
   res.status(200).json(list);
 };
 
@@ -17,8 +19,10 @@ const getContactById = async (req, res, next) => {
 };
 
 const addContact = async (req, res, next) => {
+  const { _id: owner } = req.user;
+
   const data = req.body;
-  const newContact = await db.addContact(data);
+  const newContact = await db.addContact({ ...data, owner });
 
   res.status(201).json(newContact);
 };
