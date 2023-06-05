@@ -5,7 +5,11 @@ const db = require("../service/DBOperations");
 const getContacts = async (req, res, next) => {
   const { _id: owner } = req.user;
 
-  const list = await db.getContacts(owner);
+  const { page = 1, limit = 10 } = req.query;
+
+  const skip = (page - 1) * limit;
+
+  const list = await db.getContacts(owner, { skip, limit });
   res.status(200).json(list);
 };
 
