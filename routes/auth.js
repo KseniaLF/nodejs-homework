@@ -1,7 +1,7 @@
 const express = require("express");
 
 const AuthController = require("../controllers/auth");
-// const { authenticate } = require("../middlewares");
+const { authenticate } = require("../middlewares");
 
 const router = express.Router();
 
@@ -11,8 +11,8 @@ router.post("/register", jsonParser, AuthController.register);
 
 router.post("/login", jsonParser, AuthController.login);
 
-// router.get("/123", authenticate, (req, res) => {
-//   res.json("XXXX");
-// });
+router.get("/current", authenticate, AuthController.getCurrent);
+
+router.get("/logout", authenticate, AuthController.logout);
 
 module.exports = router;
