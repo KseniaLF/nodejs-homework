@@ -3,6 +3,7 @@ const express = require("express");
 const AuthController = require("../controllers/auth");
 const { authenticate, validateBody } = require("../middlewares");
 const { authSchema } = require("../schemas/auth");
+const { subscriptionSchema } = require("../schemas/subscription");
 
 const router = express.Router();
 
@@ -25,5 +26,12 @@ router.post(
 router.get("/current", authenticate, AuthController.getCurrent);
 
 router.get("/logout", authenticate, AuthController.logout);
+
+router.patch(
+  "/",
+  authenticate,
+  validateBody(subscriptionSchema),
+  AuthController.updateSubscription
+);
 
 module.exports = router;
