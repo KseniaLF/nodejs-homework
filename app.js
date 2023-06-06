@@ -14,11 +14,6 @@ app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 
-// app.use((req, res, next) => {
-//   console.log("Наше проміжне ПЗ");
-//   next();
-// });
-
 app.use("/api/contacts", contactsRouter);
 
 app.use("/users", authRouter);
