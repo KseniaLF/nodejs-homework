@@ -1,7 +1,9 @@
-const Contact = require("./schemas/contact");
+const Contact = require("../models/contact");
 
-const getContacts = async () => {
-  return Contact.find();
+const getContacts = async (owner, { skip, limit, favorite }) => {
+  const data = favorite ? { owner, favorite } : { owner };
+
+  return Contact.find(data).skip(skip).limit(limit).populate("owner");
 };
 
 const getContactById = async (id) => {

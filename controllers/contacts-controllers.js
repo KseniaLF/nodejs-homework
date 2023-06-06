@@ -1,24 +1,20 @@
-const { contactAddSchema } = require("../schemas/contacts-schemas");
-
 const { HttpError } = require("../helpers");
 const ctrlWrapper = require("../decorators/ctrlWrapper");
-const {
-  getContacts,
-  getContactById,
-  addContact,
-  removeContact,
-  updateContact,
-  updateStatusContact,
-} = require("../service/DBOperations");
-const { favoriteSchema } = require("../schemas/favorite");
+const db = require("../service/DBOperations");
 
-const getAll = async (req, res, next) => {
-  const list = await getContacts();
+const getContacts = async (req, res, next) => {
+  const { _id: owner } = req.user;
+
+  const { page = 1, limit = 10, favorite } = req.query;
+  const skip = (page - 1) * limit;
+
+  const list = await db.getContacts(owner, { skip, limit, favorite });
+
   res.status(200).json(list);
 };
 
-const getOne = async (req, res, next) => {
-  const contact = await getContactById(req.params.id);
+const getContactById = async (req, res, next) => {
+  const contact = await db.getContactById(req.params.id);
   if (!contact) {
     throw new HttpError(404, "Not found");
   }
@@ -26,19 +22,17 @@ const getOne = async (req, res, next) => {
   res.status(200).json(contact);
 };
 
-const addOne = async (req, res, next) => {
-  const { error } = contactAddSchema.validate(req.body);
-  if (error) {
-    throw new HttpError(400, error.message);
-  }
+const addContact = async (req, res, next) => {
+  const { _id: owner } = req.user;
+
   const data = req.body;
-  const newContact = await addContact(data);
+  const newContact = await db.addContact({ ...data, owner });
 
   res.status(201).json(newContact);
 };
 
-const removeOne = async (req, res, next) => {
-  const deletedContact = await removeContact(req.params.id);
+const removeContact = async (req, res, next) => {
+  const deletedContact = await db.removeContact(req.params.id);
 
   if (!deletedContact) {
     throw new HttpError(404, "Not found");
@@ -46,13 +40,8 @@ const removeOne = async (req, res, next) => {
   res.json({ message: "contact deleted" });
 };
 
-const updateOne = async (req, res, next) => {
-  const { error } = contactAddSchema.validate(req.body);
-  if (error) {
-    throw new HttpError(400, error.message);
-  }
-
-  const updatedContact = await updateContact(req.params.id, req.body);
+const updateContact = async (req, res, next) => {
+  const updatedContact = await db.updateContact(req.params.id, req.body);
 
   if (!updatedContact) {
     throw new HttpError(404, "Not found");
@@ -60,13 +49,8 @@ const updateOne = async (req, res, next) => {
   res.json(updatedContact);
 };
 
-const makeFavorite = async (req, res, next) => {
-  const { error } = favoriteSchema.validate(req.body);
-  if (error) {
-    throw new HttpError(400, error.message);
-  }
-
-  const updatedContact = await updateStatusContact(req.params.id, req.body);
+const updateStatusContact = async (req, res, next) => {
+  const updatedContact = await db.updateStatusContact(req.params.id, req.body);
 
   if (!updatedContact) {
     throw new HttpError(404, "Not found");
@@ -75,10 +59,10 @@ const makeFavorite = async (req, res, next) => {
 };
 
 module.exports = {
-  getAll: ctrlWrapper(getAll),
-  getOne: ctrlWrapper(getOne),
-  addOne: ctrlWrapper(addOne),
-  removeOne: ctrlWrapper(removeOne),
-  updateOne: ctrlWrapper(updateOne),
-  makeFavorite: ctrlWrapper(makeFavorite),
+  getContacts: ctrlWrapper(getContacts),
+  getContactById: ctrlWrapper(getContactById),
+  addContact: ctrlWrapper(addContact),
+  removeContact: ctrlWrapper(removeContact),
+  updateContact: ctrlWrapper(updateContact),
+  updateStatusContact: ctrlWrapper(updateStatusContact),
 };
