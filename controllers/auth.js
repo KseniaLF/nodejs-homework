@@ -1,9 +1,12 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const ctrlWrapper = require("../decorators/ctrlWrapper");
+const { nanoid } = require("nanoid");
+// const sendEmail = require("./helpers/sendEmail");
 
 const jwt = require("jsonwebtoken");
-const { SECRET_KEY } = process.env;
+const { sendEmail } = require("../helpers");
+const { SECRET_KEY, PROJECT_URL } = process.env;
 
 const register = async (req, res, next) => {
   const user = {
@@ -18,11 +21,55 @@ const register = async (req, res, next) => {
   }
 
   user.password = await bcrypt.hash(user.password, 10);
-  await User.create(user);
+  const verificationToken = nanoid();
+
+  const newUser = await User.create({ ...user, verificationToken });
+
+  const verifyEmail = {
+    to: user.email,
+    subject: "Verification Code",
+    html: `<a target="_blank" href="${PROJECT_URL}/users/verify/${verificationToken}">click</a>`,
+  };
+  await sendEmail(verifyEmail);
 
   return res
     .status(201)
     .json({ user: { email: user.email, subscription: "starter" } });
+};
+
+const verify = async (req, res, next) => {
+  const { verificationToken } = req.params;
+  const user = await User.findOne({ verificationToken });
+  if (user === null) {
+    return res.status(404).json({ message: "Token is invalid" });
+  }
+
+  await User.findByIdAndUpdate(user._id, {
+    verify: true,
+    verificationToken: "",
+  });
+
+  res.json({ message: "Verify success" });
+};
+
+const resendVerifyEmail = async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  if (user.verify) {
+    return res.status(400).json({ message: "Email already verified" });
+  }
+
+  const verifyEmail = {
+    to: email,
+    subject: "Verification Code",
+    html: `<a target="_blank" href="${PROJECT_URL}/users/verify/${user.verificationToken}">click</a>`,
+  };
+  await sendEmail(verifyEmail);
+  res.json({ message: "Verify email send" });
 };
 
 const login = async (req, res, next) => {
@@ -31,7 +78,7 @@ const login = async (req, res, next) => {
   const user = await User.findOne({ email });
   console.log(user);
 
-  if (user === null) {
+  if (!user || !user.verify) {
     return res.status(401).json({ message: "Email or password is wrong" });
   }
 
@@ -76,6 +123,8 @@ const updateSubscription = async (req, res) => {
 
 module.exports = {
   register: ctrlWrapper(register),
+  verify: ctrlWrapper(verify),
+  resendVerifyEmail: ctrlWrapper(resendVerifyEmail),
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
