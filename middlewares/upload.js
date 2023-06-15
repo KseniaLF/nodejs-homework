@@ -1,7 +1,7 @@
 const multer = require("multer");
 const path = require("path");
 
-// const { HttpError } = require("../helpers");
+const { HttpError } = require("../helpers");
 
 const destination = path.resolve("temp");
 
@@ -20,13 +20,10 @@ const limits = {
 };
 
 const fileFilter = (req, file, cb) => {
-  console.log(file);
-
-  // const { mimetype } = file;
-  // if (mimetype !== "image/png") {
-  //   console.log(123);
-  //   cb(new HttpError(400, "only image/png"), false);
-  // }
+  const { mimetype } = file;
+  if (mimetype !== "image/png" && mimetype !== "image/jpeg") {
+    cb(new HttpError(400, "only png or jpeg"), false);
+  }
 
   cb(null, true);
 };
