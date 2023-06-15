@@ -1,6 +1,10 @@
 const { HttpError } = require("../helpers");
 const ctrlWrapper = require("../decorators/ctrlWrapper");
 const db = require("../service/DBOperations");
+const fs = require("fs/promises");
+const path = require("path");
+
+const contactsPath = path.resolve("public", "avatars");
 
 const getContacts = async (req, res, next) => {
   const { _id: owner } = req.user;
@@ -23,10 +27,19 @@ const getContactById = async (req, res, next) => {
 };
 
 const addContact = async (req, res, next) => {
-  const { _id: owner } = req.user;
+  const { path: oldPath, filename } = req.file;
+  const newPath = path.join(contactsPath, filename);
 
-  const data = req.body;
-  const newContact = await db.addContact({ ...data, owner });
+  await fs.rename(oldPath, newPath);
+
+  const avatarURL = path.join("avatars", filename);
+
+  const { _id: owner } = req.user;
+  const newContact = await db.addContact({
+    ...req.body,
+    avatarURL,
+    owner,
+  });
 
   res.status(201).json(newContact);
 };

@@ -1,15 +1,24 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const ctrlWrapper = require("../decorators/ctrlWrapper");
+const gravatar = require("gravatar");
+const path = require("path");
+const fs = require("fs/promises");
+const jimp = require("jimp");
 
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = process.env;
 
+const contactsPath = path.resolve("public", "avatars");
+
 const register = async (req, res, next) => {
+  const avatarURL = gravatar.url(req.body.email);
+
   const user = {
     email: req.body.email,
     password: req.body.password,
     subscription: req.body.subscription,
+    avatarURL,
   };
 
   const currentUser = await User.findOne({ email: user.email });
@@ -74,10 +83,28 @@ const updateSubscription = async (req, res) => {
   res.json({ message: "Subscription updated" });
 };
 
+const updateAvatar = async (req, res) => {
+  const { _id } = req.user;
+  const { path: oldPath, filename } = req.file;
+  const newFilename = `${_id}_${filename}`;
+
+  const newPath = path.join(contactsPath, newFilename);
+  await fs.rename(oldPath, newPath);
+
+  const image = await jimp.read(newPath);
+  await image.resize(250, 250).write(newPath);
+
+  const avatarURL = path.join("avatars", newFilename);
+  await User.findByIdAndUpdate(_id, { avatarURL });
+
+  res.json({ avatarURL });
+};
+
 module.exports = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
   updateSubscription: ctrlWrapper(updateSubscription),
+  updateAvatar: ctrlWrapper(updateAvatar),
 };
