@@ -20,6 +20,10 @@ const contactSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+    avatarURL: {
+      type: String,
+      required: [true, "Set avatarURL for contact"],
+    },
   },
   {
     versionKey: false,

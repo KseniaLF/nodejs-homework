@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const { contactsController } = require("../../controllers");
-const { validateBody } = require("../../middlewares");
+const { validateBody, upload } = require("../../middlewares");
 const authenticate = require("../../middlewares/authenticate");
 const { contactAddSchema } = require("../../schemas/contacts-schemas");
 const { favoriteSchema } = require("../../schemas/favorite");
@@ -13,7 +13,7 @@ router.get("/", contactsController.getContacts);
 
 router.get("/:id", contactsController.getContactById);
 
-router.post("/", validateBody(contactAddSchema), contactsController.addContact);
+router.post("/", upload.single("avatarURL"), contactsController.addContact);
 
 router.delete("/:id", contactsController.removeContact);
 
